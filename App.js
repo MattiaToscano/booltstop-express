@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 // Associo il router dei giochi
 app.use('/api/games', gamesRouter);
 
-// Gestione errori 
+// Gestione errori
 app.use(notFound);
 app.use(errorHandler);
 

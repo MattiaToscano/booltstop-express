@@ -95,31 +95,31 @@ const update = (req, res) => {
         // Verifica se il prodotto esiste
         connection.query('SELECT * FROM products WHERE id = ?', [id], (error, results) => {
             if (error) {
-                return res.status(500).json({ success: false, message: 'Errore nella verifica del gioco', error });
+                return res.status(500).json({ success: false, message: 'Errore nella verifica del gioco', error }); // Se il gioco non viene trovato, restituisco un errore 500
             }
-            if (results.length === 0) {
+            if (results.length === 0) { // Se il gioco non esiste, restituisco un errore 404
                 return res.status(404).json({ success: false, message: 'Gioco non trovato' });
             }
 
             // Crea un oggetto con i campi da aggiornare
-            const updatedProduct = {};
-            if (name !== undefined) updatedProduct.name = name;
-            if (description !== undefined) updatedProduct.description = description;
-            if (price !== undefined) updatedProduct.price = price;
-            if (image !== undefined) updatedProduct.image = image;
-            if (discount !== undefined) updatedProduct.discount = discount;
-            if (release_date !== undefined) updatedProduct.release_date = release_date;
-            if (sold_pieces !== undefined) updatedProduct.sold_pieces = sold_pieces;
+            const updatedProduct = {}; // Inizializzo un oggetto vuoto per i campi da aggiornare
+            if (name !== undefined) updatedProduct.name = name; // Aggiungo il nome se definito
+            if (description !== undefined) updatedProduct.description = description; // Aggiungo la descrizione se definita
+            if (price !== undefined) updatedProduct.price = price; // Aggiungo il prezzo se definito
+            if (image !== undefined) updatedProduct.image = image; // Aggiungo l'immagine se definita
+            if (discount !== undefined) updatedProduct.discount = discount; // Aggiungo lo sconto se definito
+            if (release_date !== undefined) updatedProduct.release_date = release_date; // Aggiungo la data di rilascio se definita
+            if (sold_pieces !== undefined) updatedProduct.sold_pieces = sold_pieces;// Aggiungo le copie vendute se definito
 
             connection.query('UPDATE products SET ? WHERE id = ?', [updatedProduct, id], (error) => {
                 if (error) {
-                    return res.status(500).json({ success: false, message: 'Errore nell\'aggiornamento del gioco', error });
+                    return res.status(500).json({ success: false, message: 'Errore nell\'aggiornamento del gioco', error }); // Se c'è un errore nell'aggiornamento, restituisco un errore 500
                 }
-                return res.status(200).json({ success: true, message: 'Gioco aggiornato con successo', data: { id, ...updatedProduct } });
+                return res.status(200).json({ success: true, message: 'Gioco aggiornato con successo', data: { id, ...updatedProduct } }); // Rispondo con il gioco aggiornato
             });
         });
     } catch (error) {
-        return res.status(500).json({ success: false, message: 'Errore del server', error });
+        return res.status(500).json({ success: false, message: 'Errore del server', error }); // Gestisco eventuali errori del server
     }
 };
 
@@ -131,18 +131,18 @@ const destroy = (req, res) => {
         // Verifica se il prodotto esiste
         connection.query('SELECT * FROM products WHERE id = ?', [id], (error, results) => {
             if (error) {
-                return res.status(500).json({ success: false, message: 'Errore nella verifica del gioco', error });
+                return res.status(500).json({ success: false, message: 'Errore nella verifica del gioco', error }); // Se il gioco non viene verificato, restituisco un errore 500
             }
             if (results.length === 0) {
-                return res.status(404).json({ success: false, message: 'Gioco non trovato' });
+                return res.status(404).json({ success: false, message: 'Gioco non trovato' }); // Se il gioco non esiste, restituisco un errore 404
             }
 
             // Elimina il gioco
             connection.query('DELETE FROM products WHERE id = ?', [id], (error) => {
                 if (error) {
-                    return res.status(500).json({ success: false, message: 'Errore nell\'eliminazione del gioco', error });
+                    return res.status(500).json({ success: false, message: 'Errore nell\'eliminazione del gioco', error }); // Se c'è un errore nell'eliminazione, restituisco un errore 500
                 }
-                return res.status(200).json({ success: true, message: 'Gioco eliminato con successo' });
+                return res.status(200).json({ success: true, message: 'Gioco eliminato con successo' }); // Rispondo con un messaggio di successo
             });
         });
     } catch (error) {
@@ -153,12 +153,12 @@ const destroy = (req, res) => {
 // GET - Ricerca giochi per prezzo massimo
 const getByPriceRange = (req, res) => {
     try {
-        const minPrice = parseFloat(req.query.min) || 0;
-        const maxPrice = parseFloat(req.query.max) || 1000000;
+        const minPrice = parseFloat(req.query.min) || 0; // Valore minimo di prezzo, predefinito a 0
+        const maxPrice = parseFloat(req.query.max) || 1000000; // Valore massimo di prezzo, predefinito a 1000000
 
-        // Validazione dei valori
-        if (isNaN(minPrice) || isNaN(maxPrice) || minPrice < 0 || maxPrice < 0) {
-            return res.status(400).json({ success: false, message: 'Parametri di prezzo non validi' });
+        // Validazione dei valori di prezzo
+        if (minPrice < 0 || maxPrice < 0) {
+            return res.status(400).json({ success: false, message: 'I prezzi devono essere positivi' });
         }
 
         // Query per trovare prodotti in un intervallo di prezzo
@@ -171,7 +171,7 @@ const getByPriceRange = (req, res) => {
                 if (results.length === 0) {
                     return res.status(404).json({ success: false, message: `Nessun gioco trovato nell'intervallo di prezzo ${minPrice} - ${maxPrice}` });
                 }
-                return res.status(200).json({
+                return res.status(200).json({ // Rispondo con i risultati della ricerca
                     success: true,
                     count: results.length,
                     priceRange: { min: minPrice, max: maxPrice },
@@ -188,13 +188,13 @@ const getByPriceRange = (req, res) => {
 const getDiscounted = (req, res) => {
     try {
         connection.query('SELECT * FROM products WHERE discount > 0 ORDER BY discount DESC', (error, results) => {
-            if (error) {
+            if (error) { //
                 return res.status(500).json({ success: false, message: 'Errore nella ricerca dei giochi in offerta', error });
             }
             if (results.length === 0) {
                 return res.status(404).json({ success: false, message: 'Nessun gioco in offerta trovato' });
             }
-            return res.status(200).json({
+            return res.status(200).json({ // Rispondo con i risultati della ricerca
                 success: true,
                 count: results.length,
                 data: results
