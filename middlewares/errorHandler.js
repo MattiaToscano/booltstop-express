@@ -1,6 +1,6 @@
 //Middleware per gestire gli errori
 
-function errorHandler(err, req, res, next) {
+function errorHandler(err, req, res, next) { // Funzione middleware per gestire gli errori
     console.error(err.stack);
     res.status(500).json({
         status: 'Errore',

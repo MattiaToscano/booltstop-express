@@ -205,6 +205,47 @@ const getDiscounted = (req, res) => {
     }
 };
 
+
+// GET - Ricerca giochi per genere (versione semplificata)
+const sortByGenre = (req, res) => {
+    try {
+        const genre = req.params.genre;
+
+        connection.query(
+            'SELECT * FROM products WHERE genre LIKE ? ORDER BY name ASC',
+            [`%${genre}%`],
+            (error, results) => {
+                if (error) {
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Errore nella ricerca dei giochi per genere',
+                        error
+                    });
+                }
+
+                if (results.length === 0) {
+                    return res.status(404).json({
+                        success: false,
+                        message: `Nessun gioco trovato per il genere ${genre}`
+                    });
+                }
+
+                return res.status(200).json({
+                    success: true,
+                    count: results.length,
+                    data: results
+                });
+            }
+        );
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Errore del server',
+            error
+        });
+    }
+};
+
 module.exports = {
     index,
     show,
@@ -212,5 +253,6 @@ module.exports = {
     update,
     destroy,
     getByPriceRange,
-    getDiscounted
+    getDiscounted,
+    sortByGenre
 };

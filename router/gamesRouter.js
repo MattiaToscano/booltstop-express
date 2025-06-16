@@ -15,6 +15,9 @@ router.get('/price-range', gameController.getByPriceRange);
 // GET - Recuperare un gioco specifico tramite ID
 router.get('/:id', gameController.show);
 
+// GET - Recuperare un gioco specifico tramite genere
+router.get('/genre/:genre', gameController.sortByGenre);
+
 // POST - Creare un nuovo gioco
 router.post('/', gameController.store);
 
