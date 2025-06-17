@@ -1,6 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const gameController = require('../controllers/gameController');
+const express = require('express'); // Importo express per creare il router
+const router = express.Router(); // Creo un router per gestire le rotte dei giochi
+const gameController = require('../controllers/gameController'); // Importo il controller dei giochi
+
+
 // Definisco le rotte CRUD principali
 
 // GET - Recuperare tutti i giochi

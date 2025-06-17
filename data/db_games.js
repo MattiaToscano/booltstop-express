@@ -3,11 +3,11 @@ const mysql = require('mysql2'); // Importo mysql dalla libreria
 // Configurazione della connessione al database
 const connection = mysql.createConnection({ // Creo una connessione al database
     // Configurazione della connessione al database
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER,
-    port: process.env.DB_PORT || 3306,
-    password: process.env.DB_PASSWORD || 'ciao',
-    database: process.env.DB_NAME || 'games_db'
+    host: process.env.DB_HOST || 'localhost', // Host del database, di default localhost
+    user: process.env.DB_USER, // Utente del database, prelevato da variabile d'ambiente
+    port: process.env.DB_PORT || 3306, // Porta del database, di default 3306
+    password: process.env.DB_PASSWORD || 'ciao', // Password del database, "non ve la scrivo nel commento", chiedetemela in privato
+    database: process.env.DB_NAME || 'games_db' // Nome del database, prelevato da variabile d'ambiente o di default 'games_db'
 })
 
 // Connessione al database

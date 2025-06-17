@@ -25,7 +25,7 @@ const index = (req, res) => { // Funzione per recuperare tutti i giochi
 const show = (req, res) => {
     try {
         const id = req.params.id;
-        connection.query('SELECT * FROM products WHERE id = ?', [id], (error, results) => {
+        connection.query('SELECT * FROM products WHERE id = ?', [id], (error, results) => { // Eseguo la query per recuperare il gioco specifico
             if (error) {
                 return res.status(500).json({ success: false, message: 'Errore nel recupero del gioco', error });
             }
@@ -44,7 +44,7 @@ const store = (req, res) => {
     console.log('Richiesta POST ricevuta:', req.body);
 
     // Verifica se req.body è undefined o vuoto
-    if (!req.body || Object.keys(req.body).length === 0) {
+    if (!req.body || !req.body.name || !req.body.price) { // Controllo se il body della richiesta è vuoto o non contiene i campi obbligatori
         return res.status(400).json({
             success: false,
             message: 'Body della richiesta vuoto o non valido. Assicurati di inviare dati JSON validi con header Content-Type: application/json'
@@ -72,7 +72,7 @@ const store = (req, res) => {
 
         console.log('Tentativo di inserimento:', newProduct);
 
-        connection.query('INSERT INTO products SET ?', newProduct, (error, results) => {
+        connection.query('INSERT INTO products SET ?', newProduct, (error, results) => { // Eseguo la query per inserire il nuovo gioco
             if (error) {
                 console.error('Errore SQL durante inserimento:', error);
                 return res.status(500).json({ success: false, message: 'Errore nella creazione del gioco', error });
@@ -129,7 +129,7 @@ const destroy = (req, res) => {
         const id = req.params.id;
 
         // Verifica se il prodotto esiste
-        connection.query('SELECT * FROM products WHERE id = ?', [id], (error, results) => {
+        connection.query('SELECT * FROM products WHERE id = ?', [id], (error, results) => { // Controllo se il gioco esiste
             if (error) {
                 return res.status(500).json({ success: false, message: 'Errore nella verifica del gioco', error }); // Se il gioco non viene verificato, restituisco un errore 500
             }
@@ -162,7 +162,7 @@ const getByPriceRange = (req, res) => {
         }
 
         // Query per trovare prodotti in un intervallo di prezzo
-        connection.query('SELECT * FROM products WHERE price BETWEEN ? AND ? ORDER BY price ASC',
+        connection.query('SELECT * FROM products WHERE price BETWEEN ? AND ? ORDER BY price ASC', // Query per trovare prodotti in un intervallo di prezzo
             [minPrice, maxPrice],
             (error, results) => {
                 if (error) {
@@ -187,7 +187,7 @@ const getByPriceRange = (req, res) => {
 // GET - Ricerca giochi in offerta (con discount > 0)
 const getDiscounted = (req, res) => {
     try {
-        connection.query('SELECT * FROM products WHERE discount > 0 ORDER BY discount DESC', (error, results) => {
+        connection.query('SELECT * FROM products WHERE discount > 0 ORDER BY discount DESC', (error, results) => { // Query per trovare prodotti in offerta
             if (error) { //
                 return res.status(500).json({ success: false, message: 'Errore nella ricerca dei giochi in offerta', error });
             }
@@ -206,13 +206,13 @@ const getDiscounted = (req, res) => {
 };
 
 
-// GET - Ricerca giochi per genere (versione semplificata)
+// GET - Ricerca giochi per genere
 const sortByGenre = (req, res) => {
     try {
         const genre = req.params.genre;
 
         connection.query(
-            'SELECT * FROM products WHERE genre LIKE ? ORDER BY name ASC',
+            'SELECT * FROM products WHERE genre LIKE ? ORDER BY name ASC', // Query per trovare prodotti per genere
             [`%${genre}%`],
             (error, results) => {
                 if (error) {
