@@ -2,12 +2,20 @@ const express = require('express'); // Importo Express
 const errorHandler = require('./middlewares/errorHandler'); // Middleware per la gestione degli errori
 const notFound = require('./middlewares/notFound'); // Middleware per gestire le rotte non trovate
 const gamesRouter = require('./router/gamesRouter');// Importo il router dei giochi
+const connection = require('./data/db_games.js'); // Importo la connessione al database
 
 
 const app = express(); // Inizializzo l'app Express
 const PORT = process.env.SERVER_PORT || 3000; //Imposto la porta del server
 
-
+// Verifica la connessione al database
+connection.connect(err => {
+    if (err) {
+        console.error('Errore connessione al database:', err);
+        process.exit(1); // Termina l'applicazione in caso di errore di connessione
+    }
+    console.log('Connessione al database stabilita con successo');
+});
 
 // Middlewares
 app.use(express.static('public'));

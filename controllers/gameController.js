@@ -1,23 +1,101 @@
 //Importo connessione al database
 const connection = require('../data/db_games.js');
+const fs = require('fs');
+const path = require('path');
 
 //Creo metodi per le operatzioni CRUD
 
-// GET - Recuperare tutti i giochi
-const index = (req, res) => { // Funzione per recuperare tutti i giochi
-    console.log('Richiesta GET ricevuta per recuperare tutti i giochi');
-    try { // Provo a eseguire la query
-        connection.query('SELECT * FROM products', (error, results) => {
-            if (error) { // Gestisco eventuali errori nella query
+// GET - Recuperare tutti i giochi con paginazione
+const index = (req, res) => {
+    console.log('Richiesta GET ricevuta per recuperare i giochi con paginazione');
+
+    try {
+        // Ottengo il numero di pagina
+        const page = parseInt(req.query.page) || 1;
+
+        // Imposto il numero di elementi per pagina(10)
+        const itemsPerPage = 10;
+
+        // Offset
+        const offset = (page - 1) * itemsPerPage;
+
+        console.log(`Paginazione attiva: pagina ${page}, limit ${itemsPerPage}, offset ${offset}`);
+
+        // Query con LIMIT e OFFSET per la paginazione
+        connection.query('SELECT * FROM products LIMIT ? OFFSET ?', [itemsPerPage, offset], (error, results) => { // Eseguo la query per recuperare i giochi con paginazione
+            if (error) {
                 console.error('Errore SQL:', error);
-                return res.status(500).json({ success: false, message: 'Errore nel recupero dei giochi', error }); // Rispondo con un errore 500
+                return res.status(500).json({ success: false, message: 'Errore nel recupero dei giochi', error });
             }
-            console.log(`Recuperati ${results.length} prodotti con successo`);
-            return res.status(200).json({ success: true, count: results.length, data: results }); // Rispondo con i risultati della query
+
+            console.log(`Recuperati con successo ${results.length} prodotti per la pagina ${page}`);
+
+            // Se non ci sono risultati ma è richiesta una pagina > 1
+            if (results.length === 0 && page > 1) {
+                connection.query('SELECT COUNT(*) as count FROM products', (countError, countResults) => {
+                    if (countError) {
+                        return res.status(500).json({ success: false, message: 'Errore nel conteggio dei prodotti' });
+                    }
+
+                    const totalItems = countResults[0].count;
+                    const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+                    if (page > totalPages) { // Se la pagina richiesta è maggiore del numero totale di pagine
+                        return res.status(404).json({
+                            success: false,
+                            message: `Pagina non valida. Ci sono solo ${totalPages} pagine disponibili`
+                        });
+                    } else {
+                        return res.json([]); // Pagina valida ma vuota
+                    }
+                });
+            } else {
+                // Invia i risultati paginati come semplice array
+                return res.json(results);
+            }
         });
     } catch (error) {
-        console.error('Eccezione catturata:', error);
+        console.error('Eccezione:', error);
         return res.status(500).json({ success: false, message: 'Errore del server', error });
+    }
+};
+
+// GET - Recuperare tutti i giochi senza paginazione
+const getAll = (req, res) => {
+    console.log('Richiesta GET ricevuta per recuperare tutti i giochi (senza paginazione)');
+
+    try {
+        // Query per recuperare tutti i prodotti
+        connection.query('SELECT * FROM products', (error, results) => { // Eseguo la query per recuperare tutti i giochi senza paginazione
+            if (error) {
+                console.error('Errore SQL:', error);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Errore nel recupero di tutti i giochi',
+                    error
+                });
+            }
+
+            console.log(`Recuperati con successo ${results.length} prodotti (senza paginazione)`);
+
+            // Se non ci sono risultati, invia un array vuoto
+            if (results.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Nessun gioco trovato nel database'
+                });
+            }
+
+            // Invia i risultati
+            return res.status(200).json(results);
+        });
+    } catch (error) {
+        console.error('Eccezione:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Errore del server',
+            error: error.toString()
+        });
     }
 };
 
@@ -246,8 +324,13 @@ const sortByGenre = (req, res) => {
     }
 };
 
+// Rimuovi il metodo getAllGames() e assicurati che solo index() gestisca la paginazione
+// Il metodo index() esistente è corretto, ma aggiungiamo qualche log per il debugging
+
+// Rimuovi il metodo getAllGames dall'exportazione
 module.exports = {
     index,
+    getAll, // Aggiungi il nuovo metodo all'esportazione
     show,
     store,
     update,

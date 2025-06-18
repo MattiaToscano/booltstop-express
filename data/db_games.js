@@ -6,7 +6,7 @@ const connection = mysql.createConnection({ // Creo una connessione al database
     host: process.env.DB_HOST || 'localhost', // Host del database, di default localhost
     user: process.env.DB_USER, // Utente del database, prelevato da variabile d'ambiente
     port: process.env.DB_PORT || 3306, // Porta del database, di default 3306
-    password: process.env.DB_PASSWORD || 'ciao', // Password del database, "non ve la scrivo nel commento", chiedetemela in privato
+    password: process.env.DB_PASSWORD || 'ciao', // Password del database
     database: process.env.DB_NAME || 'games_db' // Nome del database, prelevato da variabile d'ambiente o di default 'games_db'
 })
 
