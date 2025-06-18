@@ -12,7 +12,6 @@ const PORT = process.env.SERVER_PORT || 3000; //Imposto la porta del server
 connection.connect(err => {
     if (err) {
         console.error('Errore connessione al database:', err);
-        process.exit(1); // Termina l'applicazione in caso di errore di connessione
     }
     console.log('Connessione al database stabilita con successo');
 });
@@ -20,7 +19,7 @@ connection.connect(err => {
 // Middlewares
 app.use(express.static('public'));
 app.use(express.json());  // Per il parsing dei body JSON
-app.use(express.urlencoded({ extended: true }));  // Per il parsing dei form data
+
 
 // Rotta base
 app.get('/', (req, res) => {
