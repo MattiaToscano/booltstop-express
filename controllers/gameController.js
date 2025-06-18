@@ -34,10 +34,85 @@ const show = (req, res) => {
     });
 };
 
-// POST - Creare un nuovo gioco
+// POST - Creare un nuovo ordine
 const store = (req, res) => {
-    // Metodo lasciato vuoto
-    res.status(501).json({ message: "Funzionalità non implementata" });
+    // Ottengo i dati dal body della richiesta
+    const {
+        total_price,
+        shipment_price,
+        status,
+        name,
+        surname,
+        address,
+        email,
+        phone,
+        items // Array di oggetti {id_product, quantity}
+    } = req.body;
+
+    // Verifico che siano presenti tutti i campi obbligatori
+    if (!total_price || !shipment_price || !status || !name || !surname || !address || !email || !phone || !items || !Array.isArray(items)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Dati mancanti. Tutti i campi sono obbligatori.'
+        });
+    }
+
+    // Validazione basilare dello status
+    const validStatus = ['paid', 'shipped', 'cancelled', 'pending'];
+    if (!validStatus.includes(status)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Status non valido. Valori accettati: paid, shipped, cancelled, pending'
+        });
+    }
+
+    // Eseguo la query per inserire l'ordine
+    connection.query(
+        'INSERT INTO `order` (total_price, shipment_price, status, name, surname, address, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [total_price, shipment_price, status, name, surname, address, email, phone],
+        (error, results) => {
+            if (error) {
+                console.error('Errore nella creazione dell\'ordine:', error);
+                return res.status(500).json({ success: false, error: 'Errore durante la creazione dell\'ordine' });
+            }
+
+            const orderId = results.insertId;
+
+            // Inserisco gli elementi dell'ordine
+            if (items.length > 0) {
+                // Preparo i valori per l'inserimento multiplo
+                const orderItemValues = items.map(item => [item.id_product, orderId, item.quantity]);
+
+                // Query per inserire gli elementi dell'ordine
+                const orderItemsQuery = 'INSERT INTO order_item (id_product, id_order, quantity) VALUES ?';
+
+                connection.query(orderItemsQuery, [orderItemValues], (orderItemsError) => {
+                    if (orderItemsError) {
+                        console.error('Errore nell\'inserimento degli elementi dell\'ordine:', orderItemsError);
+                        return res.status(500).json({
+                            success: false,
+                            message: 'Ordine creato ma errore nell\'inserimento degli elementi',
+                            orderId
+                        });
+                    }
+
+                    // Risposta con successo
+                    return res.status(201).json({
+                        success: true,
+                        message: 'Ordine creato con successo',
+                        orderId
+                    });
+                });
+            } else {
+                // Risposta con successo se non ci sono elementi nell'ordine
+                return res.status(201).json({
+                    success: true,
+                    message: 'Ordine creato con successo (nessun elemento)',
+                    orderId
+                });
+            }
+        }
+    );
 };
 
 // GET - Ricerca giochi in offerta (con discount > 0)
