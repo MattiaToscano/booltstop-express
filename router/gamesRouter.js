@@ -25,7 +25,31 @@ router.get('/', gameController.index); //http://localhost:3000/api/games?page="1
 // GET - Recuperare un gioco specifico tramite ID
 router.get('/:id', gameController.show); // http://localhost:3000/api/games/10
 
-// POST - Il metodo CREA è vuoto
-router.post('/', gameController.store);
+// POST - Aggiungere nuovo ordine
+router.post('/', gameController.store); //http://localhost:3000/api/games  NEL BODY DELLA RICHIESTA DEVI INSERIRE I DATI DEL GIOCO CHE VUOI AGGIUNGERE IN FORMATO JSON CON: TOTAL_PRICE,SHIPMENT_PRICE,STATUS,NAME,SURNAME,ADDRESS,EMAIL,PHONE,PRODUCTS (QUEST'ULTIMO È UN ARRAY DI OGGETTI CON ID E QUANTITY)
+
+// Ecco un esempio  per fare un check su postman:
+// {
+//   "total_price": 159.99,
+//   "shipment_price": 4.99,
+//   "status": "pending",
+//   "name": "Mario",
+//   "surname": "Rossi",
+//   "address": "Via Roma 123, Milano",
+//   "email": "mario.rossi@example.com",
+//   "phone": "3491234567",
+//   "items": [
+//     {
+//       "id_product": 1,
+//       "quantity": 1
+//     },
+//     {
+//       "id_product": 2,
+//       "quantity": 2
+//     }
+//   ]
+// }
+//}
+
 
 module.exports = router;

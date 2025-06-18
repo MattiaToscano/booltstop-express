@@ -68,7 +68,7 @@ const store = (req, res) => {
 
     // Eseguo la query per inserire l'ordine
     connection.query(
-        'INSERT INTO `order` (total_price, shipment_price, status, name, surname, address, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', // Query per inserire l'ordine
+        'INSERT INTO `orders` (total_price, shipment_price, status, name, surname, address, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [total_price, shipment_price, status, name, surname, address, email, phone],
         (error, results) => {
             if (error) {
@@ -92,6 +92,7 @@ const store = (req, res) => {
                         return res.status(500).json({
                             success: false,
                             message: 'Ordine creato ma errore nell\'inserimento degli elementi',
+                            error: orderItemsError.message,
                             orderId
                         });
                     }
