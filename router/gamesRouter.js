@@ -22,8 +22,8 @@ router.get('/search', gameController.searchGames); //http://localhost:3000/api/g
 // GET - Recuperare tutti i giochi (paginazione)
 router.get('/', gameController.index); //http://localhost:3000/api/games?page="1/2/3/4"
 
-// GET - Recuperare un gioco specifico tramite ID 
-router.get('/:id', gameController.show); // http://localhost:3000/api/games/10 
+// GET - Recuperare un gioco specifico tramite ID
+router.get('/:id', gameController.show); // http://localhost:3000/api/games/10
 
 // POST - Il metodo CREA è vuoto
 router.post('/', gameController.store);

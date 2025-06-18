@@ -38,14 +38,14 @@ const show = (req, res) => {
 const store = (req, res) => {
     // Ottengo i dati dal body della richiesta
     const {
-        total_price,
-        shipment_price,
-        status,
-        name,
-        surname,
-        address,
-        email,
-        phone,
+        total_price, // Prezzo totale dell'ordine
+        shipment_price, // Prezzo totale della spedizione
+        status, // Stato dell'ordine (paid, shipped, cancelled, pending)
+        name,   // Nome del cliente
+        surname, // Cognome del cliente
+        address, // Indirizzo del cliente
+        email, // Email del cliente
+        phone, //  Telefono del cliente
         items // Array di oggetti {id_product, quantity}
     } = req.body;
 
@@ -58,8 +58,8 @@ const store = (req, res) => {
     }
 
     // Validazione basilare dello status
-    const validStatus = ['paid', 'shipped', 'cancelled', 'pending'];
-    if (!validStatus.includes(status)) {
+    const validStatus = ['paid', 'shipped', 'cancelled', 'pending']; // Definisco gli stati validi
+    if (!validStatus.includes(status)) { // Controllo se lo status è valido
         return res.status(400).json({
             success: false,
             message: 'Status non valido. Valori accettati: paid, shipped, cancelled, pending'
@@ -68,7 +68,7 @@ const store = (req, res) => {
 
     // Eseguo la query per inserire l'ordine
     connection.query(
-        'INSERT INTO `order` (total_price, shipment_price, status, name, surname, address, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO `order` (total_price, shipment_price, status, name, surname, address, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', // Query per inserire l'ordine
         [total_price, shipment_price, status, name, surname, address, email, phone],
         (error, results) => {
             if (error) {
@@ -159,8 +159,8 @@ const searchGames = (req, res) => {
     // Otteniamo i parametri dalla query
     const { genre, discounted } = req.query;
 
-    let query = 'SELECT * FROM products WHERE 1=1';
-    let params = [];
+    let query = 'SELECT * FROM products WHERE 1=1'; // Iniziamo con una query di base che seleziona tutti i prodotti
+    let params = []; // Array per i parametri della query
 
     // Se è specificato un genere, filtriamo per genere
     if (genre) {
