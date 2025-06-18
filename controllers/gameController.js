@@ -79,6 +79,38 @@ const sortByGenre = (req, res) => {
     );
 };
 
+// GET - Ricerca unificata (genere e/o sconto)
+const searchGames = (req, res) => {
+    // Otteniamo i parametri dalla query
+    const { genre, discounted } = req.query;
+
+    let query = 'SELECT * FROM products WHERE 1=1';
+    let params = [];
+
+    // Se è specificato un genere, filtriamo per genere
+    if (genre) {
+        query += ' AND genre LIKE ?'; // Utilizziamo LIKE per cercare il genere
+        params.push(`%${genre}%`);// Aggiungiamo il genere ai parametri
+    }
+
+    // Se è richiesto solo prodotti scontati, filtriamo per sconto
+    if (discounted === 'true') {
+        query += ' AND discount > 0'; // Filtriamo per prodotti con sconto maggiore di 0
+
+        // Ordina per sconto decrescente quando cerchiamo prodotti scontati
+        query += ' ORDER BY discount DESC';// Ordine per sconto decrescente
+
+    } else {
+        // Ordine predefinito per prezzo
+        query += ' ORDER BY price ASC';// Ordine per prezzo crescente
+    }
+
+    connection.query(query, params, (error, results) => {
+        if (error) return res.status(500).json({ success: false, error });
+        return res.json(results);
+    });
+};
+
 // Esporto i metodi
 module.exports = {
     index,
@@ -87,5 +119,6 @@ module.exports = {
     store,
     getDiscounted,
     getByPriceRange,
-    sortByGenre
+    sortByGenre,
+    searchGames
 };
