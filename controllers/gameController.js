@@ -187,6 +187,38 @@ const searchGames = (req, res) => {
     });
 };
 
+// GET - Recuperare i nuovi arrivi del 2024
+const getNewReleases = (req, res) => {
+    // Otteniamo il limite opzionale dalla query string o usiamo 8 come predefinito
+    const limit = parseInt(req.query.limit) || 8;
+
+    // Impostiamo le date specifiche per il 2024
+    const startDate = '2023-01-01';
+    const endDate = '2023-12-31';
+
+    // Query per ottenere i giochi rilasciati nel 2023, ordinati per data di rilascio decrescente
+    connection.query(
+        'SELECT * FROM products WHERE release_date >= ? AND release_date <= ? ORDER BY release_date DESC LIMIT ?',
+        [startDate, endDate, limit],
+        (error, results) => {
+            if (error) {
+                console.error('Errore nel recupero dei nuovi arrivi:', error);
+                return res.status(500).json({ success: false, error: 'Errore nel recupero dei nuovi arrivi' });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Nessun gioco rilasciato nel 2024',
+                    results: []
+                });
+            }
+
+            return res.json(results);
+        }
+    );
+};
+
 // Esporto i metodi
 module.exports = {
     index,
@@ -196,5 +228,6 @@ module.exports = {
     getDiscounted,
     getByPriceRange,
     sortByGenre,
-    searchGames
+    searchGames,
+    getNewReleases
 };

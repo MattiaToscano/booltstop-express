@@ -19,6 +19,9 @@ router.get('/genre/:genre', gameController.sortByGenre); //http://localhost:3000
 // Get - Ricerca unificata per offerta e genere
 router.get('/search', gameController.searchGames); //http://localhost:3000/api/games/search?genre=RPG&discounted=true  SOSTITUISCI RPG CON IL GENERE CHE VUOI RICERCARE E TRUE CON FALSE SE NON VUOI I GIOCHI IN OFFERTA
 
+// GET - Recuperare i nuovi arrivi
+router.get('/new-releases', gameController.getNewReleases); //http://localhost:3000/api/games/new-releases?limit=4 Recupera i primi 4 giochi aggiunti di recente. Puoi cambiare il numero di giochi cambiando il valore di limit nell'URL.
+
 // GET - Recuperare tutti i giochi (paginazione)
 router.get('/', gameController.index); //http://localhost:3000/api/games?page="1/2/3/4"
 
@@ -50,6 +53,5 @@ router.post('/', gameController.store); //http://localhost:3000/api/games  NEL B
 //   ]
 // }
 //}
-
 
 module.exports = router;
