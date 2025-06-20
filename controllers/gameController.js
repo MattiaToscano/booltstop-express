@@ -1,17 +1,50 @@
 //Importo connessione al database
 const connection = require('../data/db_games.js');
 
-// GET - Recuperare tutti i giochi con paginazione
+// GET - Recuperare tutti i giochi con paginazione e limite personalizzabile
 const index = (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const itemsPerPage = 10;
-    const offset = (page - 1) * itemsPerPage;
+    // Recupero i parametri di paginazione dalla query string
+    const page = parseInt(req.query.page) || 1; // Pagina corrente (default: 1)
+    const perPage = parseInt(req.query.perPage) || 9; // Prodotti per pagina (default: 9)
 
-    connection.query('SELECT * FROM products LIMIT ? OFFSET ?',
-        [itemsPerPage, offset],
+    // Calcolo l'offset per la query SQL
+    const offset = (page - 1) * perPage;
+
+    // Array di valori consentiti per perPage
+    const allowedPerPageValues = [9, 18, 27, 36];
+
+    // Verifica se il valore perPage è consentito, altrimenti usa il default
+    const validPerPage = allowedPerPageValues.includes(perPage) ? perPage : 9;
+
+    // Prima query: recupero i prodotti con paginazione
+    connection.query(
+        'SELECT * FROM products LIMIT ? OFFSET ?',
+        [validPerPage, offset],
         (error, results) => {
             if (error) return res.status(500).json({ success: false, error });
-            return res.json(results);
+
+            // Seconda query: recupero il numero totale di prodotti
+            connection.query(
+                'SELECT COUNT(*) as total FROM products',
+                (countError, countResults) => {
+                    if (countError) return res.status(500).json({ success: false, error: countError });
+
+                    // Calcolo il numero totale di pagine
+                    const total = countResults[0].total;
+                    const totalPages = Math.ceil(total / validPerPage);
+
+                    // Costruisco l'oggetto di risposta con informazioni sulla paginazione
+                    return res.json({
+                        success: true,
+                        currentPage: page,
+                        totalPages: totalPages,
+                        perPage: validPerPage,
+                        total: total,
+                        allowedPerPageValues: allowedPerPageValues,
+                        results: results
+                    });
+                }
+            );
         }
     );
 };

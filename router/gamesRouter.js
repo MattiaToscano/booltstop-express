@@ -47,7 +47,14 @@ router.get('/autocomplete', gameController.searchAutocomplete);
 
 
 // GET - Recuperare tutti i giochi (paginazione)
-router.get('/', gameController.index); //http://localhost:3000/api/games?page="1/2/3/4"
+router.get('/', gameController.index);
+// http://localhost:3000/api/games?page=1&perPage=9
+//Sostituisci il 9 con il numero di prodotti che vuoi visualizzare per pagina (valori consentiti: 9, 18, 27, 36). Se non specifichi il parametro perPage, verrà utilizzato il valore predefinito di 9.
+// http://localhost:3000/api/games?perPage=27&page=2 perPage=27 e page=2 significa che vuoi visualizzare 27 prodotti per pagina e stai richiedendo la seconda pagina dei risultati.
+// Parametri supportati:
+//   - page: numero di pagina (default: 1)
+//   - perPage: prodotti per pagina (valori consentiti: 9, 18, 27, 36, default: 9)
+
 
 // GET - Recuperare un gioco specifico tramite ID (DEVE STARE DOPO TUTTE LE ROTTE SPECIFICHE)
 router.get('/:id', gameController.show); // http://localhost:3000/api/games/10
