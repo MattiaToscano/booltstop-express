@@ -22,10 +22,27 @@ router.get('/search', gameController.searchGames); //http://localhost:3000/api/g
 // GET - Recuperare i nuovi arrivi
 router.get('/new-releases', gameController.getNewReleases); //http://localhost:3000/api/games/new-releases?limit=4 Recupera i primi 4 giochi aggiunti di recente. Puoi cambiare il numero di giochi cambiando il valore di limit nell'URL.
 
+// GET - Ordinamento giochi per vari criteri
+// Versione senza parametro opzionale : rotta base
+router.get('/order', gameController.orderGames);
+//http://localhost:3000/api/games/order
+
+// GET - Ordinamento giochi per vari criteri con tipo specificato
+router.get('/order/:type', gameController.orderGames);
+// Esempi di utilizzo per questa rotta:
+// http://localhost:3000/api/games/order/title-asc  (A-Z)
+// http://localhost:3000/api/games/order/title-desc (Z-A)
+// http://localhost:3000/api/games/order/price-asc  (prezzo crescente)
+// http://localhost:3000/api/games/order/price-desc (prezzo decrescente)
+// http://localhost:3000/api/games/order/release-date-desc (più recenti)
+// http://localhost:3000/api/games/order/release-date-asc (più vecchi)
+// http://localhost:3000/api/games/order/discount-desc (maggior sconto)
+// http://localhost:3000/api/games/order/discount-asc (minor sconto)
+
 // GET - Recuperare tutti i giochi (paginazione)
 router.get('/', gameController.index); //http://localhost:3000/api/games?page="1/2/3/4"
 
-// GET - Recuperare un gioco specifico tramite ID
+// GET - Recuperare un gioco specifico tramite ID (DEVE STARE DOPO TUTTE LE ROTTE SPECIFICHE)
 router.get('/:id', gameController.show); // http://localhost:3000/api/games/10
 
 // POST - Aggiungere nuovo ordine

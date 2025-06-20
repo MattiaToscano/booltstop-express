@@ -157,7 +157,7 @@ const sortByGenre = (req, res) => {
 
 // GET - Ricerca unificata (genere e/o sconto)
 const searchGames = (req, res) => {
-    // Otteniamo i parametri dalla query
+    // Ottengo i parametri dalla query
     const { genre, discounted } = req.query;
 
     let query = 'SELECT * FROM products WHERE 1=1'; // Iniziamo con una query di base che seleziona tutti i prodotti
@@ -189,10 +189,10 @@ const searchGames = (req, res) => {
 
 // GET - Recuperare i nuovi arrivi del 2024
 const getNewReleases = (req, res) => {
-    // Otteniamo il limite opzionale dalla query string o usiamo 8 come predefinito
+    // Ottengo il limite opzionale dalla query string o usiamo 8 come predefinito
     const limit = parseInt(req.query.limit) || 8;
 
-    // Impostiamo le date specifiche per il 2024
+    // Imposto le date specifiche per il 2024
     const startDate = '2023-01-01';
     const endDate = '2023-12-31';
 
@@ -219,6 +219,58 @@ const getNewReleases = (req, res) => {
     );
 };
 
+// GET - Ordinamento giochi per vari criteri
+const orderGames = (req, res) => {
+    // Parametro per specificare il tipo di ordinamento
+    const orderType = req.params.type || 'title-asc';
+
+    // Oggetto di configurazione per i diversi tipi di ordinamento
+    const orderConfigs = {
+        // Ordinamento alfabetico
+        'title-asc': { field: 'name', direction: 'ASC' },
+        'title-desc': { field: 'name', direction: 'DESC' },
+
+        // Ordinamento per prezzo
+        'price-asc': { field: 'price', direction: 'ASC' },
+        'price-desc': { field: 'price', direction: 'DESC' },
+
+        // Ordinamento per data di rilascio
+        'release-date-asc': { field: 'release_date', direction: 'ASC' },
+        'release-date-desc': { field: 'release_date', direction: 'DESC' },
+
+        // Ordinamento per sconto
+        'discount-asc': { field: 'discount', direction: 'ASC' },
+        'discount-desc': { field: 'discount', direction: 'DESC' }
+    };
+
+    // Verifica se il tipo di ordinamento è valido
+    if (!orderConfigs[orderType]) {
+        return res.status(400).json({
+            success: false,
+            message: `Tipo di ordinamento "${orderType}" non valido.`,
+        });
+    }
+
+    // Ottengo la configurazione per il tipo di ordinamento richiesto
+    const config = orderConfigs[orderType];
+
+    //Eseguo la query per ordinare i giochi
+    connection.query(
+        `SELECT * FROM products ORDER BY ${config.field} ${config.direction}`,
+        (error, results) => {
+            if (error) {
+                console.error('Errore durante l\'ordinamento dei giochi:', error);
+                return res.status(500).json({
+                    success: false,
+                    message: 'Errore durante l\'ordinamento dei giochi',
+                    error: error.message
+                });
+            }
+            return res.json(results);
+        }
+    );
+};
+
 // Esporto i metodi
 module.exports = {
     index,
@@ -229,5 +281,6 @@ module.exports = {
     getByPriceRange,
     sortByGenre,
     searchGames,
-    getNewReleases
+    getNewReleases,
+    orderGames
 };
