@@ -271,6 +271,58 @@ const orderGames = (req, res) => {
     );
 };
 
+// GET - Ricerca autocomplete per nome del gioco (case-insensitive)
+const searchAutocomplete = (req, res) => {
+    try {
+        // Ottieni il termine di ricerca dalla query string
+        const term = req.query.term;
+        console.log('Termine ricevuto:', term);
+
+        // Se non c'è un termine di ricerca, restituisci un array vuoto
+        if (!term || term.trim() === '') {
+            return res.json({
+                success: true,
+                count: 0,
+                results: []
+            });
+        }
+
+        // Uso LOWER per rendere la ricerca case-insensitive
+        const query = 'SELECT id, name, price, image, discount FROM products WHERE LOWER(name) LIKE LOWER(?) ORDER BY name ASC LIMIT 10';
+        const searchPattern = term + '%'; // Sostituisco il punto interrogativo con il termine di ricerca seguito da un carattere jolly che rappresenta qualsiasi sequenza di caratteri
+
+        connection.query( // Eseguo la query di ricerca
+            query,
+            [searchPattern],
+            (error, results) => {
+                if (error) {
+                    console.error('Errore nella ricerca autocomplete:', error);
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Errore durante la ricerca autocomplete',
+                        error: error.message
+                    });
+                }
+
+                console.log(`Trovati ${results.length} risultati per "${term}"`);
+
+                return res.json({
+                    success: true,
+                    count: results.length,
+                    results: results
+                });
+            }
+        );
+    } catch (err) {
+        console.error('Errore generale in searchAutocomplete:', err);
+        return res.status(500).json({
+            success: false,
+            message: 'Errore interno del server',
+            error: err.message
+        });
+    }
+};
+
 // Esporto i metodi
 module.exports = {
     index,
@@ -282,5 +334,6 @@ module.exports = {
     sortByGenre,
     searchGames,
     getNewReleases,
-    orderGames
+    orderGames,
+    searchAutocomplete
 };

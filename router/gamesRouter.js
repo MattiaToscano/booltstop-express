@@ -39,6 +39,13 @@ router.get('/order/:type', gameController.orderGames);
 // http://localhost:3000/api/games/order/discount-desc (maggior sconto)
 // http://localhost:3000/api/games/order/discount-asc (minor sconto)
 
+// GET - Ricerca autocomplete per nome del gioco
+router.get('/autocomplete', gameController.searchAutocomplete);
+// http://localhost:3000/api/games/autocomplete?term=M
+// Trova tutti i giochi che iniziano con "M"
+// Per ulteriori check, sostituire alla lettera "M" qualsiasi altra lettera o parte del nome del gioco che si desidera cercare.
+
+
 // GET - Recuperare tutti i giochi (paginazione)
 router.get('/', gameController.index); //http://localhost:3000/api/games?page="1/2/3/4"
 
